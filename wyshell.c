@@ -44,7 +44,8 @@ int main (int argc, char * argv[]){
         firstWordNode = calloc(1, sizeof(struct Word));
         firstWordNode->command = lexeme;
         firstWordNode->prev = NULL;
-        
+        // got to get the first one and then i think the second so we can point
+        // backwards easily. 
         while(rtn != EOL){
             switch (rtn) {
                 case WORD:
