@@ -15,13 +15,39 @@
 #include "stdlib.h"
 #include "wyscanner.h"
 
-
 struct Word{
     char *next, *prev;
     char *command;
-    int in, out, err;
-    bool first;
 };
+
+struct Node{
+        struct Node *next, *prev;
+        char *command;
+        struct Word *arg_list;
+        int in, out, err;
+        char *inFile, *outFile, *errFile;
+};
+
+void pushToBack(struct Node ** tailRef, char *data){
+    struct Node *newNode;
+    newNode = calloc(1, sizeof(struct Node));
+    newNode->command = data;
+    newNode->next = NULL;
+    newNode->prev = (*tailRef);
+    (*tailRef) = newNode;
+}
+
+void printData(struct Node * myNode){
+    while(myNode != NULL){
+        printf("data for this node is: %s\n", myNode->command);
+        myNode = myNode->prev;
+    }
+}
+
+/// TODO: well my linked list is working but backwards of what i would like
+// i can probably just reverse the order of something to straighten it out
+// it always assigns the last word to all the commands of each node, except when
+// i add them one at time manually
 
 
 int main (int argc, char * argv[]){
@@ -37,15 +63,29 @@ int main (int argc, char * argv[]){
             }
         }
         rtn = parse_line(buf);
+        if(rtn == EOL){
+            printf("not a valid input\n");
+            continue;
+        }
 
-        char * myPrev;
-        myPrev = NULL;
-        struct Word *firstWordNode;
-        firstWordNode = calloc(1, sizeof(struct Word));
-        firstWordNode->command = lexeme;
-        firstWordNode->prev = NULL;
+        struct Node *node, *head;
+        node = calloc(1, sizeof(struct Node));
+        //node->prev == NULL;
+
+
+        while(rtn != EOL){
+            printf("command is : %s\n", lexeme);
+            pushToBack(&node, lexeme); // this node add method doesnt work
+            rtn = parse_line(NULL);
+        }
+        // these work
+        pushToBack(&node, "one");
+        pushToBack(&node, "two");
+        pushToBack(&node, "three");
+
         // got to get the first one and then i think the second so we can point
-        // backwards easily. 
+        // backwards easily.
+        /*
         while(rtn != EOL){
             switch (rtn) {
                 case WORD:
@@ -69,8 +109,8 @@ int main (int argc, char * argv[]){
                     break;
             }
         }
-
-        printf("first node is\n" );
+        */
+        printData(node);
 
 /*
         while(rtn != EOL){
