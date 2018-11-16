@@ -23,37 +23,146 @@ struct Word{
 struct Node{
         struct Node *next, *prev;
         char *command;
+        int num;
         struct Word *arg_list;
         int in, out, err;
         char *inFile, *outFile, *errFile;
 };
 
-void pushToBack(struct Node ** tailRef, char *data){
+struct Node * head;
+
+void pushToBack(struct Node ** headRef, char *data){
     struct Node *newNode;
-    newNode = calloc(1, sizeof(struct Node));
-    newNode->command = data;
-    newNode->next = NULL;
-    newNode->prev = (*tailRef);
-    (*tailRef) = newNode;
+    newNode = (struct Node*)calloc(1, sizeof(struct Node));
+    newNode->command = strdup(data);
+    newNode->next = (*headRef);
+    (*headRef) = newNode;
 }
 
-void printData(struct Node * myNode){
+/*
+struct Node *head = NULL;
+struct Node *start = NULL;
+
+void insert(char * data, int num) {
+   //create a link
+   struct Node *link = (struct Node*) malloc(sizeof(struct Node));
+
+   link->command = strdup(data);
+   link->num = num;
+
+   //point it to old first node
+   link->next = head;
+
+   //point first to new first node
+   head = link;
+
+   if(start == NULL){
+     //  start = link;
+     //  printf("start command: %s, link command: %s\n",start->command, link->command );
+   }
+}
+*/
+
+void printData(struct Node *  myNode){
+    //struct Node * ptr = head;
     while(myNode != NULL){
         printf("data for this node is: %s\n", myNode->command);
         myNode = myNode->prev;
+
     }
 }
 
+/* Function to reverse the linked list */
+static void reverseList(struct Node** headRef)
+{
+    struct Node* prev   = NULL;
+    struct Node* current = *headRef;
+    struct Node* next = NULL;
+    while (current != NULL)
+    {
+        // Store next
+        next  = current->next;
+
+        // Reverse current node's pointer
+        current->next = prev;
+
+        // Move pointers one position ahead.
+        prev = current;
+        current = next;
+    }
+    *headRef = prev;
+}
+
+
+/*
+//display the list
+void printList() {
+
+   struct Node *ptr = head;
+
+   printf("\n[head] =>");
+   //start from the beginning
+   while(ptr != NULL) {
+      printf(" %s + %d =>",ptr->command, ptr->num);
+      ptr = ptr->next;
+   }
+
+   printf(" [null]\n");
+}
+*/
 /// TODO: well my linked list is working but backwards of what i would like
 // i can probably just reverse the order of something to straighten it out
 // it always assigns the last word to all the commands of each node, except when
 // i add them one at time manually
 
 
+/* Function to reverse the linked list */
+static void reverse(struct Node** headRef)
+{
+  struct Node* prev   = NULL;
+  struct Node* current = *headRef;
+  struct Node* next = NULL;
+  while (current != NULL)
+  {
+      // Store next
+      next  = current->next;
+
+      // Reverse current node's pointer
+      current->next = prev;
+
+      // Move pointers one position ahead.
+      prev = current;
+      current = next;
+  }
+  *headRef = prev;
+}
+
+/* Function to push a node */
+void push(struct Node** headRef, char * data)
+{
+  struct Node* newNode =
+          (struct Node*) malloc(sizeof(struct Node));
+  newNode->command  = strdup(data);
+  newNode->next = (*headRef);
+  (*headRef)    = newNode;
+}
+
+/* Function to print linked list */
+void printList(struct Node *head)
+{
+  struct Node *tmp = head;
+  while(tmp != NULL)
+  {
+      printf(" %s,", tmp->command);
+      tmp = tmp->next;
+  }
+}
+
 int main (int argc, char * argv[]){
     char buf[256];
     int rtn;
     char *rtpt;
+    head = calloc(1, sizeof(struct Node));
     while(1){
         printf("$> ");
         rtpt = fgets(buf, 256, stdin);
@@ -69,19 +178,19 @@ int main (int argc, char * argv[]){
         }
 
         struct Node *node, *head;
-        node = calloc(1, sizeof(struct Node));
-        //node->prev == NULL;
-
+        node = NULL;//calloc(1, sizeof(struct Node));
 
         while(rtn != EOL){
             printf("command is : %s\n", lexeme);
-            pushToBack(&node, lexeme); // this node add method doesnt work
+            push(&node, lexeme);
             rtn = parse_line(NULL);
         }
+        reverse(&node);
+        printList(node);
         // these work
-        pushToBack(&node, "one");
-        pushToBack(&node, "two");
-        pushToBack(&node, "three");
+        //pushToBack(&node, "one");
+        //pushToBack(&node, "two");
+        //pushToBack(&node, "three");
 
         // got to get the first one and then i think the second so we can point
         // backwards easily.
@@ -110,7 +219,6 @@ int main (int argc, char * argv[]){
             }
         }
         */
-        printData(node);
 
 /*
         while(rtn != EOL){
