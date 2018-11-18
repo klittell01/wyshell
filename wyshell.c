@@ -82,11 +82,6 @@ int main (int argc, char * argv[]){
     char buf[256];
     int rtn;
     char *rtpt;
-    bool dirOut = false;
-    bool dirIn = false;
-    bool dirErr = false;
-    bool appErr = false;
-    bool appOut = false;
     while(1){
         printf("$> ");
         rtpt = fgets(buf, 256, stdin);
@@ -101,14 +96,14 @@ int main (int argc, char * argv[]){
             continue;
         }
 
-        struct Node *node;
-        node = NULL;
+        // will be implementing in next part
+        //struct Node *node;
+        //node = NULL;
 
         bool rdOut = false;
         bool rdIn = false;
         bool rdErr = false;
         bool rdDefined = false;
-
         bool background = false;
         bool myError = false;
         bool beginningOfCommand = true;
@@ -122,6 +117,7 @@ int main (int argc, char * argv[]){
                         rdIn = false;
                         rdOut = false;
                         rdErr = false;
+                        rdDefined = true;
                     } else {
                         printf(" --: %s\n", lexeme);
                         rdDefined = true;
@@ -130,6 +126,7 @@ int main (int argc, char * argv[]){
                 case ERROR_CHAR:
                     break;
                 default:
+                    // if it is a pipe character
                     if (strcmp(tokens[rtn %96], "PIPE") == 0){
                         if(beginningOfCommand == true){
                             break;
@@ -141,14 +138,18 @@ int main (int argc, char * argv[]){
                         rdOut = false;
                         rdErr = false;
                         rdDefined = false;
-                    } else if(strcmp(tokens[rtn %96], "SEMICOLON") == 0){
+                    }
+                    // if it is a semicolon character
+                    else if(strcmp(tokens[rtn %96], "SEMICOLON") == 0){
                         printf(" ;\n");
                         beginningOfCommand = true;
                         rdIn = false;
                         rdOut = false;
                         rdErr = false;
                         rdDefined = false;
-                    } else if(strcmp(tokens[rtn %96], "REDIR_OUT") == 0){
+                    }
+                    // if it is a > character
+                    else if(strcmp(tokens[rtn %96], "REDIR_OUT") == 0){
                         if(beginningOfCommand == true){
                             myError = true;
                             printf("Ambiguous redirection\n");
@@ -160,10 +161,11 @@ int main (int argc, char * argv[]){
                             break;
                         }
                         printf(" >\n");
-                        dirOut = true;
                         rdOut = true;
                         rdDefined = false;
-                    } else if(strcmp(tokens[rtn %96], "REDIR_IN") == 0){
+                    }
+                    // if it is a < character
+                    else if(strcmp(tokens[rtn %96], "REDIR_IN") == 0){
                         if(beginningOfCommand == true){
                             myError = true;
                             printf("Ambiguous redirection\n");
@@ -175,10 +177,11 @@ int main (int argc, char * argv[]){
                             break;
                         }
                         printf(" <\n");
-                        dirIn = true;
                         rdIn = true;
                         rdDefined = false;
-                    } else if(strcmp(tokens[rtn %96], "REDIR_ERR") == 0){
+                    }
+                    // if it is the 2>1 character
+                     else if(strcmp(tokens[rtn %96], "REDIR_ERR") == 0){
                         if(beginningOfCommand == true){
                             myError = true;
                             printf("Ambiguous redirection\n");
@@ -189,11 +192,12 @@ int main (int argc, char * argv[]){
                             myError = true;
                             break;
                         }
-                        printf(" 2>\n");
-                        dirErr = true;
+                        printf(" 2>1\n");
                         rdErr = true;
                         rdDefined = false;
-                    } else if(strcmp(tokens[rtn %96], "APPEND_OUT") == 0){
+                    }
+                    // if it is a >> character
+                     else if(strcmp(tokens[rtn %96], "APPEND_OUT") == 0){
                         if(beginningOfCommand == true){
                             myError = true;
                             printf("Ambiguous redirection\n");
@@ -205,10 +209,11 @@ int main (int argc, char * argv[]){
                             break;
                         }
                         printf(" >>\n");
-                        dirOut = true;
                         rdOut = true;
                         rdDefined = false;
-                    } else if(strcmp(tokens[rtn %96], "APPEND_ERR") == 0){
+                    }
+                    // if it is a 2>> character
+                    else if(strcmp(tokens[rtn %96], "APPEND_ERR") == 0){
                         if(beginningOfCommand == true){
                             myError = true;
                             printf("Ambiguous redirection\n");
@@ -220,13 +225,16 @@ int main (int argc, char * argv[]){
                             break;
                         }
                         printf(" 2>>\n");
-                        dirErr = true;
                         rdErr = true;
                         rdDefined = false;
-                    } else if (strcmp(tokens[rtn %96], "QUOTE_ERROR") == 0){
+                    }
+                    // if it is only an opening quote with no close
+                    else if (strcmp(tokens[rtn %96], "QUOTE_ERROR") == 0){
                         myError = true;
                         break;
-                    } else if (strcmp(tokens[rtn %96], "AMP") == 0){
+                    }
+                    // if it is an & character
+                     else if (strcmp(tokens[rtn %96], "AMP") == 0){
                         background = true;
                     }
                     //printf("%d: %s\n", rtn, tokens[rtn%96]);
@@ -234,7 +242,7 @@ int main (int argc, char * argv[]){
             if(myError == true){
                 break;
             }
-            push(&node, lexeme);
+            //push(&node, lexeme);
             rtn = parse_line(NULL);
             if(rtn == EOL){
                 if(rdDefined == false){
@@ -252,5 +260,4 @@ int main (int argc, char * argv[]){
 
     }
 
-    printf("my string is: %s\n", buf);
 }
